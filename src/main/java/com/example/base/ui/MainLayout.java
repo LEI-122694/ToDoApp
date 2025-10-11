@@ -39,6 +39,8 @@ public final class MainLayout extends AppLayout {
         var nav = new SideNav();
         nav.addClassNames(Margin.Horizontal.MEDIUM);
         MenuConfiguration.getMenuEntries().forEach(entry -> nav.addItem(createSideNavItem(entry)));
+        // Add Currency Exchange Calculator tab manually
+        nav.addItem(new SideNavItem("Currency Exchange Calculator", "currency-exchange", new Icon(VaadinIcon.MONEY)));
         return nav;
     }
 
