@@ -14,12 +14,27 @@ import com.vaadin.flow.server.menu.MenuEntry;
 
 import static com.vaadin.flow.theme.lumo.LumoUtility.*;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
+
+import javax.imageio.ImageIO;
+
+import com.example.examplefeature.QrCodeGenerator;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.NativeButton;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.notification.Notification;
+
 @Layout
 public final class MainLayout extends AppLayout {
 
     MainLayout() {
         setPrimarySection(Section.DRAWER);
-        addToDrawer(createHeader(), new Scroller(createSideNav()));
+        // Mantém header e side nav; adiciona botão QR no drawer
+        addToDrawer(createHeader(), new Scroller(createSideNav()), createQrButton());
     }
 
     private Div createHeader() {
@@ -50,5 +65,83 @@ public final class MainLayout extends AppLayout {
         } else {
             return new SideNavItem(menuEntry.title(), menuEntry.path());
         }
+    }
+
+    /**
+     * Botão no drawer que abre um diálogo centralizado com a imagem do QR.
+     * Usa QrCodeGenerator.generate(...) para obter um BufferedImage e converte para data URL base64.
+     */
+    private Div createQrButton() {
+        Icon qrIcon = VaadinIcon.QRCODE.create();
+        qrIcon.addClassNames(IconSize.MEDIUM); // opcional
+
+        Button qrBtn = new Button("QR Code");
+        qrBtn.setIcon(qrIcon);
+        qrBtn.addClassNames(Margin.Horizontal.MEDIUM, Padding.Vertical.SMALL);
+
+        qrBtn.addClickListener(event -> {
+            // Texto codificado no QR (altera conforme precisares)
+            String textToEncode = "https://example.com";
+
+            try {
+                // Gera o BufferedImage usando a tua classe
+                BufferedImage qrImage = QrCodeGenerator.generate(textToEncode, 320, 320);
+
+                // Converte BufferedImage para PNG bytes
+                byte[] pngBytes;
+                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                    ImageIO.write(qrImage, "PNG", baos);
+                    baos.flush();
+                    pngBytes = baos.toByteArray();
+                }
+
+                // Converte para Base64 e cria data URL (sem StreamResource)
+                String base64 = Base64.getEncoder().encodeToString(pngBytes);
+                String dataUrl = "data:image/png;base64," + base64;
+
+                // Cria a Image com o data URL
+                Image img = new Image(dataUrl, "QR Code");
+                img.setAlt("QR Code");
+                img.setWidth("320px");
+                img.setHeight("320px");
+                img.getStyle().set("display", "block");
+
+                // Wrapper centrado para a imagem no dialog
+                Div wrapper = new Div();
+                wrapper.getStyle().set("display", "flex");
+                wrapper.getStyle().set("flex-direction", "column");
+                wrapper.getStyle().set("align-items", "center");
+                wrapper.getStyle().set("justify-content", "center");
+                wrapper.getStyle().set("padding", "var(--lumo-space-m)");
+                wrapper.getStyle().set("gap", "var(--lumo-space-s)");
+
+                H4 title = new H4("QR Code");
+                title.getStyle().set("margin", "0");
+
+                NativeButton close = new NativeButton("Fechar");
+                close.addClassName("vaadin-button");
+
+                wrapper.add(title, img, close);
+
+                Dialog dialog = new Dialog(wrapper);
+                dialog.setCloseOnOutsideClick(true);
+                dialog.setCloseOnEsc(true);
+
+                close.addClickListener(ev -> dialog.close());
+
+                // Estética — tamanho máximo responsivo
+                dialog.getElement().getStyle().set("max-width", "90vw");
+                dialog.getElement().getStyle().set("padding", "0");
+                dialog.open();
+
+            } catch (Exception ex) {
+                Notification.show("Erro ao gerar QR: " + ex.getMessage(), 4000, Notification.Position.MIDDLE);
+                ex.printStackTrace();
+            }
+        });
+
+        Div container = new Div(qrBtn);
+        container.addClassNames(Margin.Horizontal.MEDIUM);
+        return container;
     }
 }
