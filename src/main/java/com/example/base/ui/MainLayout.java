@@ -93,7 +93,7 @@ public final class MainLayout extends AppLayout {
 
         qrBtn.addClickListener(event -> {
             // Texto codificado no QR (altera conforme precisares)
-            String textToEncode = "https://www.youtube.com/";
+            String textToEncode = "https://youtu.be/bFzq17sELD8?si=Cv-F69UR5q_6i1wa";
 
             try {
                 // Gera o BufferedImage usando a tua classe
