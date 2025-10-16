@@ -65,6 +65,7 @@
             <groupId>org.webjars.npm</groupId>
             <artifactId>chart.js</artifactId>
             <version>4.5.0</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
         <dependency>
             <groupId>com.google.zxing</groupId>
