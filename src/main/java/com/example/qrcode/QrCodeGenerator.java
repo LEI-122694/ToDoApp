@@ -1,4 +1,4 @@
-package com.example.examplefeature;
+package com.example.qrcode;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
