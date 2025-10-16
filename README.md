@@ -8,9 +8,9 @@ Diogo Figueira 122664
 
 Daniel Gutierrez 122694
 
-# App README
+# Tutorial
 
-- [ ] TODO Replace or update this README with instructions relevant to your application
+https://youtu.be/bFzq17sELD8?si=Cv-F69UR5q_6i1wa
 
 ## Project Structure
 
