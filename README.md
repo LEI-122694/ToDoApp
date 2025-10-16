@@ -1,3 +1,13 @@
+# Colaboradores
+
+Carlos Gonçalves 112966 Allias: Cmmgs3, plays49
+
+Guilherme Alves 122661
+
+Diogo Figueira 122664
+
+Daniel Gutierrez 122694
+
 # App README
 
 - [ ] TODO Replace or update this README with instructions relevant to your application
