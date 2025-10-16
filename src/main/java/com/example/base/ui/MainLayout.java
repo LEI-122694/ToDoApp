@@ -1,6 +1,8 @@
 package com.example.base.ui;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -31,22 +33,31 @@ import com.vaadin.flow.component.notification.Notification;
 @Layout
 public final class MainLayout extends AppLayout {
 
-    MainLayout() {
+    public MainLayout() {
         setPrimarySection(Section.DRAWER);
         // Mantém header e side nav; adiciona botão QR no drawer
         addToDrawer(createHeader(), new Scroller(createSideNav()), createQrButton());
     }
 
     private Div createHeader() {
-        // TODO Replace with real application logo and name
         var appLogo = VaadinIcon.CUBES.create();
         appLogo.addClassNames(TextColor.PRIMARY, IconSize.LARGE);
 
         var appName = new Span("App");
         appName.addClassNames(FontWeight.SEMIBOLD, FontSize.LARGE);
 
-        var header = new Div(appLogo, appName);
-        header.addClassNames(Display.FLEX, Padding.MEDIUM, Gap.MEDIUM, AlignItems.CENTER);
+        var spacer = new Div();
+        spacer.addClassNames("flex-grow-1"); // versão simples sem constantes
+
+        // Botão PDF
+        Button pdfBtn = new Button("PDF", new Icon(VaadinIcon.DOWNLOAD_ALT));
+        pdfBtn.addClickListener(e -> {
+            // Abre o endpoint numa nova aba; o browser faz o download
+            UI.getCurrent().getPage().open("/api/exports/tasks.pdf");
+        });
+
+        var header = new Div(appLogo, appName, spacer, pdfBtn);
+        header.addClassNames(Display.FLEX, Padding.MEDIUM, Gap.MEDIUM, AlignItems.CENTER, Width.FULL);
         return header;
     }
 
