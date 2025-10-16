@@ -1,4 +1,4 @@
-package com.example.base.ui.component;
+package com.example.currency;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;

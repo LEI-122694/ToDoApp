@@ -22,8 +22,7 @@ import java.util.Base64;
 
 import javax.imageio.ImageIO;
 
-import com.example.examplefeature.QrCodeGenerator;
-import com.vaadin.flow.component.button.Button;
+import com.example.qrcode.QrCodeGenerator;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeButton;
