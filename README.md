@@ -60,6 +60,38 @@ architectural layers. It includes two feature packages: `base` and `examplefeatu
 The `src/main/frontend` directory contains an empty theme called `default`, based on the Lumo theme. It is activated in
 the `Application` class, using the `@Theme` annotation.
 
+## CI/CD – Build de JAR com GitHub Actions
+
+Este projeto tem um workflow que constrói e publica um `.jar` executável sempre que há `push` na branch `main`.
+
+### Como funciona
+- **Java 25** com `actions/setup-java`
+- **Build Maven**: `mvn clean package`
+- **Artefact**: o `.jar` fica disponível nos **Actions → Artifacts** como `app-jar`.
+
+### Excerto do workflow
+```yaml
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: mvn -B clean package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: target/*.jar
+
+
 ## Starting in Development Mode
 
 To start the application in development mode, import it into your IDE and run the `Application` class. 
