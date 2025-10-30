@@ -1,3 +1,5 @@
+name: Java CI with SonarQube
+
 on:
   push:
     branches:
@@ -5,37 +7,39 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-name: SonarQube Analysis
-
 jobs:
-  sonarqube:
+  build-and-sonar:
     runs-on: ubuntu-latest
 
     steps:
-      # Faz checkout do código
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # recomendado para análise completa
+      # 1. Faz checkout do código
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Executa a análise SonarQube
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # 2. Configura Java 17
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
-          args: >
-            -Dsonar.projectKey=LEI-122694_ToDoApp
-            -Dsonar.organization=lei-122694
+          distribution: 'temurin'
+          java-version: '17'
 
-      # Verifica o resultado do Quality Gate
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@master
+      # 3. Cache do Maven para agilizar builds
+      - name: Cache Maven packages
+        uses: actions/cache@v3
         with:
-          pollingTimeoutSec: 600
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          path: |
+            ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-      # Apenas imprime o resultado do Quality Gate (opcional)
-      - name: "Show SonarQube Quality Gate Status"
-        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+      # 4. Build do projeto com Maven
+      - name: Build with Maven
+        run: mvn clean verify
+
+      # 5. Executa a análise SonarQube/SonarCloud
+      - name: SonarQube Analysis
+        run: mvn sonar:sonar \
+          -Dsonar.projectKey=LEI-122694_ToDoApp \
+          -Dsonar.organization=lei-122694 \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
