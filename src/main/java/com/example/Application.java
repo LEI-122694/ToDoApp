@@ -13,10 +13,4 @@ public class Application implements AppShellConfigurator {
         SpringApplication.run(Application.class, args);
     }
 
-    public class Test {
-    public void exemplo() {
-        System.out.println("Olá)
-    }
-}
-
 }
