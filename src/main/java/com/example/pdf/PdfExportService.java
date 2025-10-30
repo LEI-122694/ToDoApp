@@ -46,7 +46,7 @@ public class PdfExportService {
             // Cabeçalho
             cs.setFont(PDType1Font.HELVETICA_BOLD, TEXT_SIZE);
             float[] colX = new float[] { MARGIN, MARGIN + 40, MARGIN + 300, MARGIN + 450 };
-            y = drawRow(cs, y, colX, "#", "Descrição", "Prazo", "Criada em");
+            y = drawRow(cs, y, colX);
             cs.setFont(PDType1Font.HELVETICA, TEXT_SIZE);
 
             int idx = 1;
@@ -54,12 +54,10 @@ public class PdfExportService {
                 String n = String.valueOf(idx++);
                 String desc = safe(t.getDescription());
                 String due = t.getDueDate() != null ? DATE_FMT.format(t.getDueDate()) : "-";
-                String created = t.getCreationDate() != null
-                        ? DATETIME_FMT.format(t.getCreationDate().atZone(ZoneId.systemDefault()))
-                        : "-";
+                String created = DATETIME_FMT.format(t.getCreationDate().atZone(ZoneId.systemDefault()));
 
                 // wrap da descrição
-                List<String> wrapped = wrap(desc, PDType1Font.HELVETICA, (int) TEXT_SIZE,
+                List<String> wrapped = wrap(desc,
                         page.getMediaBox().getWidth() - colX[1] - 170f);
 
                 // verifica espaço
@@ -79,13 +77,13 @@ public class PdfExportService {
                     y -= 28f;
 
                     cs.setFont(PDType1Font.HELVETICA_BOLD, TEXT_SIZE);
-                    y = drawRow(cs, y, colX, "#", "Descrição", "Prazo", "Criada em");
+                    y = drawRow(cs, y, colX);
                     cs.setFont(PDType1Font.HELVETICA, TEXT_SIZE);
                 }
 
                 // primeira linha
                 cs.beginText(); cs.newLineAtOffset(colX[0], y); cs.showText(n); cs.endText();
-                cs.beginText(); cs.newLineAtOffset(colX[1], y); cs.showText(wrapped.get(0)); cs.endText();
+                cs.beginText(); cs.newLineAtOffset(colX[1], y); cs.showText(wrapped.getFirst()); cs.endText();
                 cs.beginText(); cs.newLineAtOffset(colX[2], y); cs.showText(due); cs.endText();
                 cs.beginText(); cs.newLineAtOffset(colX[3], y); cs.showText(created); cs.endText();
                 y -= LEADING;
@@ -121,23 +119,22 @@ public class PdfExportService {
         }
     }
 
-    private static float drawRow(PDPageContentStream cs, float y, float[] colX,
-                                 String c1, String c2, String c3, String c4) throws IOException {
-        cs.beginText(); cs.newLineAtOffset(colX[0], y); cs.showText(c1); cs.endText();
-        cs.beginText(); cs.newLineAtOffset(colX[1], y); cs.showText(c2); cs.endText();
-        cs.beginText(); cs.newLineAtOffset(colX[2], y); cs.showText(c3); cs.endText();
-        cs.beginText(); cs.newLineAtOffset(colX[3], y); cs.showText(c4); cs.endText();
+    private static float drawRow(PDPageContentStream cs, float y, float[] colX) throws IOException {
+        cs.beginText(); cs.newLineAtOffset(colX[0], y); cs.showText("#"); cs.endText();
+        cs.beginText(); cs.newLineAtOffset(colX[1], y); cs.showText("Descrição"); cs.endText();
+        cs.beginText(); cs.newLineAtOffset(colX[2], y); cs.showText("Prazo"); cs.endText();
+        cs.beginText(); cs.newLineAtOffset(colX[3], y); cs.showText("Criada em"); cs.endText();
         return y - LEADING;
     }
 
-    private static List<String> wrap(String text, PDType1Font font, int fontSize, float maxWidth) throws IOException {
+    private static List<String> wrap(String text, float maxWidth) throws IOException {
         List<String> out = new ArrayList<>();
         if (text == null || text.isBlank()) { out.add(""); return out; }
         String[] words = text.split("\\s+");
         StringBuilder line = new StringBuilder();
         for (String w : words) {
             String candidate = line.isEmpty() ? w : line + " " + w;
-            float width = font.getStringWidth(candidate) / 1000 * fontSize;
+            float width = PDType1Font.HELVETICA.getStringWidth(candidate) / 1000 * 12;
             if (width <= maxWidth) {
                 line.setLength(0); line.append(candidate);
             } else {
