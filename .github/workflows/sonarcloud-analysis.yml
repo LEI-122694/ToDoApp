@@ -25,7 +25,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=LEI-122694_ToDoApp
-            -Dsonar.organization=LEI-122694
+            -Dsonar.organization=lei-122694
 
       # Verifica o resultado do Quality Gate
       - name: SonarQube Quality Gate check
