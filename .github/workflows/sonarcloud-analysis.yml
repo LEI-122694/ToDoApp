@@ -12,16 +12,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Faz checkout do código
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # recomendado para melhor análise
+          fetch-depth: 0  # recomendado para análise completa
 
       # Executa a análise SonarQube
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          # Podes apagar as linhas do SONAR_HOST_URL se o professor pediu
+        with:
+          args: >
+            -Dsonar.projectKey=LEI-122694_ToDoApp
+            -Dsonar.organization=LEI-122694
 
       # Verifica o resultado do Quality Gate
       - name: SonarQube Quality Gate check
@@ -31,8 +35,7 @@ jobs:
           pollingTimeoutSec: 600
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          # SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # podes apagar
 
-      # Apenas imprime o resultado (opcional)
+      # Apenas imprime o resultado do Quality Gate (opcional)
       - name: "Show SonarQube Quality Gate Status"
         run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
