@@ -1,3 +1,5 @@
+name: SonarQube Analysis
+
 on:
   push:
     branches:
@@ -5,36 +7,36 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-name: SonarQube Analysis
-
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # recomendado para melhor análise
+          fetch-depth: 0
 
-      # Executa a análise SonarQube
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Cache SonarCloud packages (optional)
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar-${{ hashFiles('**/pom.xml') }}
+
+      - name: Run Maven build and SonarCloud analysis
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required by some SonarCloud steps
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.organization=lei-122694
-            -Dsonar.projectKey=LEI-122694_ToDoApp
-
-      # Verifica o resultado do Quality Gate
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        with:
-          pollingTimeoutSec: 600
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      # Apenas imprime o resultado (opcional)
-      - name: "Show SonarQube Quality Gate Status"
-        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+        run: |
+          mvn -B -DskipTests=true verify sonar:sonar \
+            -Dsonar.projectKey=LEI-122694_ToDoApp \
+            -Dsonar.organization=lei-122694 \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
