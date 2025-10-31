@@ -83,8 +83,7 @@ public class PdfExportService {
 
                 // primeira linha
                 cs.beginText(); cs.newLineAtOffset(colX[0], y); cs.showText(n); cs.endText();
-                //cs.beginText(); cs.newLineAtOffset(colX[1], y); cs.showText(wrapped.getFirst()); cs.endText();
-                cs.beginText(); cs.newLineAtOffset(colX[1], y); cs.showText(wrapped.get(0)); cs.endText();
+                cs.beginText(); cs.newLineAtOffset(colX[1], y); cs.showText(wrapped.getFirst()); cs.endText();
                 cs.beginText(); cs.newLineAtOffset(colX[2], y); cs.showText(due); cs.endText();
                 cs.beginText(); cs.newLineAtOffset(colX[3], y); cs.showText(created); cs.endText();
                 y -= LEADING;
