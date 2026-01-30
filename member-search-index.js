@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"com.example.qrcode","c":"QrCodeGenerator","l":"generate(String, int, int)","u":"generate(java.lang.String,int,int)"}];updateSearchResults();
